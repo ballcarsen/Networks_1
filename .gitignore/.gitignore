@@ -104,4 +104,4 @@ venv.bak/
 .mypy_cache/
 
 #pycharm project files
-Networks_1/.idea/
+**/.idea/
