@@ -104,5 +104,5 @@ venv.bak/
 .mypy_cache/
 
 #pycharm project files
-.idea/
-__pycache__/
+../.idea/
+../__pycache__/
