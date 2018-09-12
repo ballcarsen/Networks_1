@@ -103,6 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-#pycharm project files
-../.idea/
-../__pycache__/
+# file: ~/.gitignore_global
+.DS_Store
+.idea
