@@ -17,7 +17,7 @@ def send_message(ip, port, local):
 
     conn.request("POST", "", params, headers)
     response = conn.getresponse()
-    print(response)
+    print(response.status)
     conn.close()
 
 

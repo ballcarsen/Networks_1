@@ -1,16 +1,17 @@
-import socket
 import sys
 from settings import NetworkSettings
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from flask import Flask, render_template
 
 
-class BattleShipServer(BaseHTTPRequestHandler):
+
+class BattleshipServer(BaseHTTPRequestHandler):
     #POST
     def do_POST(self):
         length = int(self.headers["Content-Length"])
         print("Data: " + str(self.rfile.read(length), "utf-8"))
 
-        response = bytes("This is the response.", "utf-8")  # create response
+        response = bytes("Response", "utf-8")
 
         self.send_response(200)
         self.send_header("Content-Length", str(len(response)))
@@ -29,8 +30,28 @@ def make_connection(port, network_settings, use_local):
         print("Wrong IP choice value")
         return(False)
 
-    server = HTTPServer((ip, port), BattleShipServer)
+    server = HTTPServer((ip, port), BattleshipServer)
     server.serve_forever()
+
+app = Flask(__name__)
+
+#Hosts the own board
+@app.route('/own_board.html')
+def display_own():
+    display("own_board")
+
+#Hosts the opponent board
+@app.route('/opponent_board.html')
+def display():
+    display("opponent_board")
+
+#Reads the text of a board and renders a template
+def display(name):
+    app.run(debug=True)
+    text = open(name + '.txt', 'r+')
+    content = text.read()
+    text.close()
+    return render_template(name + '.html', text=content)
 
 
 
@@ -40,4 +61,8 @@ if __name__ == '__main__':
     file_name = sys.argv[2]
     #0 for Brodcast IP, 1 for local ip
     use_local = int(sys.argv[3])
+
+    #Starts the flask app to host the boards
+    app.run(debug=True, use_reloader=False)
+
     make_connection(port, network_settings, use_local)
