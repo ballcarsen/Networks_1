@@ -38,20 +38,19 @@ app = Flask(__name__)
 #Hosts the own board
 @app.route('/own_board.html')
 def display_own():
-    display("own_board")
+    return (display("own_board"))
 
 #Hosts the opponent board
 @app.route('/opponent_board.html')
 def display():
-    display("opponent_board")
+    return (display("opponent_board"))
 
 #Reads the text of a board and renders a template
 def display(name):
-    app.run(debug=True)
     text = open(name + '.txt', 'r+')
     content = text.read()
     text.close()
-    return render_template(name + '.html', text=content)
+    return render_template('board.html', text=content)
 
 
 
@@ -63,6 +62,6 @@ if __name__ == '__main__':
     use_local = int(sys.argv[3])
 
     #Starts the flask app to host the boards
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True, threaded=True)
 
     make_connection(port, network_settings, use_local)
