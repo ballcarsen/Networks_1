@@ -2,8 +2,10 @@ import sys
 import board
 from settings import NetworkSettings
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import urllib.parse
 import webbrowser, os
 
+global file_name
 
 class BattleshipServer(BaseHTTPRequestHandler):
 
@@ -39,15 +41,34 @@ class BattleshipServer(BaseHTTPRequestHandler):
     def do_POST(self):
 
         length = int(self.headers["Content-Length"])
-        print("Data: " + str(self.rfile.read(length), "utf-8"))
+        data = str(self.rfile.read(length), "utf-8")
+        data = data.replace("x", "")
+        data = data.replace("y", "")
+        data = data.replace("=", "")
+        data = data.split("&")
+        params = {}
+        response = 0
+        end_game = False
+        if 9 < int(data[0]) < 0 or 9 < int(data[1]) < 0:
+            response = 404
+        else:
+            result = board.process_request(int(data[0]), int(data[1]), file_name)
+            response = result[0]
+            if len(result) == 2:
+                params = {'hit': result[1]}
+            elif len(result) == 3:
+                params = {'hit': result[1], 'sink': result[2]}
+            elif len(result) == 4:
+                params = {'hit': result[1], 'sink': result[2]}
+                end_game = True
 
-        response = bytes("Response", "utf-8")
-
-        self.send_response(200)
-        self.send_header("Content-Length", str(len(response)))
+        self.send_response(response, urllib.parse.urlencode(params))
+        self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-        self.wfile.write(response)
+        if end_game:
+            self.close_connection
+
 
 
 def make_connection(port, network_settings, use_local, name):

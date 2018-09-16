@@ -17,7 +17,7 @@ def check_board(x, y, board_array):
     char_at_pos = board_array[y][x+1]
     if char_at_pos == '_':
         board_array[y][x+1] = "O"
-        return [board_array, 200, 'hit=0']
+        return [board_array, 200, 0]
     elif char_at_pos == 'X' or char_at_pos == "O":
         return [board_array, 410]
     else:
@@ -29,12 +29,12 @@ def check_board(x, y, board_array):
         D_count = sum(x.count('D') for x in board_array)
         counts = [C_count, B_count, R_count, S_count, D_count]
         if all(count == 0 for count in counts):
-            return [board_array, 200, 'hit=1&sink=%s' % char_at_pos, True]
+            return [board_array, 200, 1, char_at_pos, True]
         else:
             if sum(x.count(char_at_pos) for x in board_array) == 0:
-                return [board_array, 200, 'hit=1&sink=%s' % char_at_pos]
+                return [board_array, 200, 1, char_at_pos]
             else:
-                return [board_array, 200, 'hit=1']
+                return [board_array, 200, 1]
 
 def update_board(x, y,  board_array, character):
     board_array[x][y+1] = character

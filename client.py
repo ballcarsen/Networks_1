@@ -4,8 +4,8 @@ import http.client
 import urllib.parse
 
 
-def send_message(ip, port, local):
-    params = urllib.parse.urlencode({"x": 7, "y": 8})
+def send_message(ip, port, x, y, local):
+    params = urllib.parse.urlencode({"x": x, "y": y})
     headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
     #If not locally hosting
     if local == 0:
@@ -17,13 +17,20 @@ def send_message(ip, port, local):
 
     conn.request("POST", "", params, headers)
     response = conn.getresponse()
-    print(response.status)
+    data = response.reason
+
+    if 'hit' in data and 'sink' in data:
+        print('sink')
+    elif 'hit' in data:
+        print('hit')
     conn.close()
 
 
 if __name__ == '__main__':
     ip = sys.argv[1]
     port = int(sys.argv[2])
-    local = int(sys.argv[3])
+    x = int(sys.argv[3])
+    y = int(sys.argv[4])
+    local = int(sys.argv[5])
 
-    send_message(ip, port, local)
+    send_message(ip, port, x, y, local)
