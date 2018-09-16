@@ -1,13 +1,43 @@
 import sys
+import board
 from settings import NetworkSettings
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from flask import Flask, render_template
-
+import webbrowser, os
 
 
 class BattleshipServer(BaseHTTPRequestHandler):
+
+    #this needs to display the boards
+    def do_GET(self):
+
+        html_name = str(self.path).replace("/", "")
+        txt_name = html_name.replace(".html", ".txt")
+        text = open(txt_name, 'r')
+
+        print(txt_name)
+        print(html_name)
+        with open(html_name, "w") as out:
+            out.write("<!DOCTYPE html>\n")
+            out.write("<html>\n<head>\n<style>\n")
+
+            out.write("line-height: 0.7 </style>\n</head>\n<body>\n")
+            out.write("<p>\n")
+
+            for line in text.readlines():
+                out.write(line + "<br>\n")
+            out.write("</p>\n</body>\n</html>")
+
+        f = open(html_name, 'rb')
+
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(f.read())
+
+
     #POST
     def do_POST(self):
+
         length = int(self.headers["Content-Length"])
         print("Data: " + str(self.rfile.read(length), "utf-8"))
 
@@ -19,7 +49,8 @@ class BattleshipServer(BaseHTTPRequestHandler):
 
         self.wfile.write(response)
 
-def make_connection(port, network_settings, use_local):
+
+def make_connection(port, network_settings, use_local, name):
     if use_local == 0:
         ip = network_settings.IP
         print("using %s as IP address" % network_settings.IP)
@@ -28,30 +59,10 @@ def make_connection(port, network_settings, use_local):
         print("using %s as IP address" % network_settings.LOCAL_IP)
     else:
         print("Wrong IP choice value")
-        return(False)
+        return False
 
     server = HTTPServer((ip, port), BattleshipServer)
     server.serve_forever()
-
-app = Flask(__name__)
-
-#Hosts the own board
-@app.route('/own_board.html')
-def display_own():
-    return (display("own_board"))
-
-#Hosts the opponent board
-@app.route('/opponent_board.html')
-def display():
-    return (display("opponent_board"))
-
-#Reads the text of a board and renders a template
-def display(name):
-    text = open(name + '.txt', 'r+')
-    content = text.read()
-    text.close()
-    return render_template('board.html', text=content)
-
 
 
 if __name__ == '__main__':
@@ -61,7 +72,4 @@ if __name__ == '__main__':
     #0 for Brodcast IP, 1 for local ip
     use_local = int(sys.argv[3])
 
-    #Starts the flask app to host the boards
-    app.run(debug=True, threaded=True)
-
-    make_connection(port, network_settings, use_local)
+    make_connection(port, network_settings, use_local, file_name)
