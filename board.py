@@ -22,13 +22,9 @@ def check_board(x, y, board_array):
         return [board_array, 410]
     else:
         board_array[y][x+1] = "X"
-        C_count = sum(x.count('C') for x in board_array)
-        B_count = sum(x.count('B') for x in board_array)
-        R_count = sum(x.count('R') for x in board_array)
-        S_count = sum(x.count('S') for x in board_array)
-        D_count = sum(x.count('D') for x in board_array)
-        counts = [C_count, B_count, R_count, S_count, D_count]
-        if all(count == 0 for count in counts):
+        count = sum(x.count("X") for x in board_array)
+        print(count)
+        if count == 17:
             return [board_array, 200, 1, char_at_pos, True]
         else:
             if sum(x.count(char_at_pos) for x in board_array) == 0:
@@ -37,7 +33,7 @@ def check_board(x, y, board_array):
                 return [board_array, 200, 1]
 
 def update_board(x, y,  board_array, character):
-    board_array[x][y+1] = character
+    board_array[y][x+1] = character
     return board_array
 
 #Client side can call process_request(x, y, file_name, character = O or X) and it will update the board
@@ -54,7 +50,7 @@ def process_request(x, y, file_name, character = None):
         return results[1:]
 
 if __name__ == '__main__':
-    print(process_request(0,5, 'own_board.txt'))
+    print(process_request(1,1, 'own_board.txt'))
 
 
 

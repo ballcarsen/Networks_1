@@ -2,6 +2,7 @@ import socket
 import sys
 import http.client
 import urllib.parse
+import board
 
 
 def send_message(ip, port, x, y, local):
@@ -18,11 +19,22 @@ def send_message(ip, port, x, y, local):
     conn.request("POST", "", params, headers)
     response = conn.getresponse()
     data = response.reason
+    print(data)
+    print(response.status)
 
-    if 'hit' in data and 'sink' in data:
-        print('sink')
+    if 'sink' in data:
+        data = data.replace("hit=", "")
+        data = data.replace("sink=", "")
+        data = data.split('&')
+        print('Sunk %s' % data[1])
+        board.process_request(x,y, 'opponent_board.txt', 'X')
     elif 'hit' in data:
-        print('hit')
+        print(data)
+        data = int(data.replace("hit=", ""))
+        if data == 0:
+            board.process_request(x, y, 'opponent_board.txt', 'O')
+        elif data == 1:
+            board.process_request(x, y, 'opponent_board.txt', 'X')
     conn.close()
 
 

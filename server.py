@@ -3,7 +3,7 @@ import board
 from settings import NetworkSettings
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import urllib.parse
-import webbrowser, os
+import re
 
 global file_name
 
@@ -21,7 +21,6 @@ class BattleshipServer(BaseHTTPRequestHandler):
         with open(html_name, "w") as out:
             out.write("<!DOCTYPE html>\n")
             out.write("<html>\n<head>\n<style>\n")
-
             out.write("line-height: 0.7 </style>\n</head>\n<body>\n")
             out.write("<p>\n")
 
@@ -41,16 +40,19 @@ class BattleshipServer(BaseHTTPRequestHandler):
     def do_POST(self):
 
         length = int(self.headers["Content-Length"])
-        data = str(self.rfile.read(length), "utf-8")
-        data = data.replace("x", "")
+        raw_data = str(self.rfile.read(length), "utf-8")
+        data = raw_data.replace("x", "")
         data = data.replace("y", "")
         data = data.replace("=", "")
         data = data.split("&")
-        params = {}
-        response = 0
         end_game = False
-        if 9 < int(data[0]) < 0 or 9 < int(data[1]) < 0:
+        params = {}
+        r = re.compile('x=\d&y=\d')
+
+        if int(data[0]) > 9 or int(data[0]) < 0 or int(data[1]) > 9 or int(data[1]) < 0:
             response = 404
+        elif r.match(raw_data) is None:
+            response = 400
         else:
             result = board.process_request(int(data[0]), int(data[1]), file_name)
             response = result[0]
@@ -59,6 +61,7 @@ class BattleshipServer(BaseHTTPRequestHandler):
             elif len(result) == 3:
                 params = {'hit': result[1], 'sink': result[2]}
             elif len(result) == 4:
+                print("hey")
                 params = {'hit': result[1], 'sink': result[2]}
                 end_game = True
 
@@ -67,6 +70,7 @@ class BattleshipServer(BaseHTTPRequestHandler):
         self.end_headers()
 
         if end_game:
+            print('end game')
             self.close_connection
 
 
