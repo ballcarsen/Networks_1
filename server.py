@@ -20,12 +20,24 @@ class BattleshipServer(BaseHTTPRequestHandler):
         print(html_name)
         with open(html_name, "w") as out:
             out.write("<!DOCTYPE html>\n")
-            out.write("<html>\n<head>\n<style>\n")
-            out.write("line-height: 0.7 </style>\n</head>\n<body>\n")
-            out.write("<p>\n")
+            out.write('<h2>Battle Ship!</h2>\n')
+            out.write('<table style="width:10%">\n')
+            out.write("<tr>\n")
+            out.write("<th>#</th>\n")
+            y = True
 
             for line in text.readlines():
-                out.write(line + "<br>\n")
+                line = line.split()
+                if y:
+                    for i in line:
+                        out.write("<th>%s</th>\n" % i)
+                    y = False
+                else:
+                    out.write("<tr>")
+                    for i in line:
+                        out.write("<td>%s</td>\n" % i)
+                out.write("</tr>")
+
             out.write("</p>\n</body>\n</html>")
 
         f = open(html_name, 'rb')
