@@ -50,7 +50,7 @@ def process_request(x, y, file_name, character = None):
         return results[1:]
 
 if __name__ == '__main__':
-    print(process_request(1,1, 'own_board.txt'))
+    print(process_request(1, 1, 'own_board.txt'))
 
 
 

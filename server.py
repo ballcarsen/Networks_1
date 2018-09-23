@@ -1,6 +1,5 @@
 import sys
 import board
-from settings import NetworkSettings
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import urllib.parse
 import re
@@ -73,7 +72,6 @@ class BattleshipServer(BaseHTTPRequestHandler):
             elif len(result) == 3:
                 params = {'hit': result[1], 'sink': result[2]}
             elif len(result) == 4:
-                print("hey")
                 params = {'hit': result[1], 'sink': result[2]}
                 end_game = True
 
@@ -86,27 +84,14 @@ class BattleshipServer(BaseHTTPRequestHandler):
             self.close_connection
 
 
-
-def make_connection(port, network_settings, use_local, name):
-    if use_local == 0:
-        ip = network_settings.IP
-        print("using %s as IP address" % network_settings.IP)
-    elif use_local == 1:
-        ip = network_settings.LOCAL_IP
-        print("using %s as IP address" % network_settings.LOCAL_IP)
-    else:
-        print("Wrong IP choice value")
-        return False
-
+def make_connection(port, ip):
     server = HTTPServer((ip, port), BattleshipServer)
     server.serve_forever()
 
 
 if __name__ == '__main__':
-    network_settings = NetworkSettings()
     port = int(sys.argv[1])
     file_name = sys.argv[2]
     #0 for Brodcast IP, 1 for local ip
-    use_local = int(sys.argv[3])
 
-    make_connection(port, network_settings, use_local, file_name)
+    make_connection(port, '127.0.0.1')
