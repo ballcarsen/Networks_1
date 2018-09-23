@@ -4,11 +4,13 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import urllib.parse
 import re
 
+# Board file name
 global file_name
 
+# Battleship server
 class BattleshipServer(BaseHTTPRequestHandler):
 
-    #this needs to display the boards
+    # Creates and hosts the requested board
     def do_GET(self):
 
         html_name = str(self.path).replace("/", "")
@@ -46,8 +48,7 @@ class BattleshipServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(f.read())
 
-
-    #POST
+    # Processes and responds to a fire request
     def do_POST(self):
 
         length = int(self.headers["Content-Length"])
@@ -60,10 +61,13 @@ class BattleshipServer(BaseHTTPRequestHandler):
         params = {}
         r = re.compile('x=\d&y=\d')
 
+        # if coordinates are out of bounds
         if int(data[0]) > 9 or int(data[0]) < 0 or int(data[1]) > 9 or int(data[1]) < 0:
             response = 404
+        # If fire message not formatted in the correct way
         elif r.match(raw_data) is None:
             response = 400
+        # Process the data
         else:
             result = board.process_request(int(data[0]), int(data[1]), file_name)
             response = result[0]
@@ -75,6 +79,7 @@ class BattleshipServer(BaseHTTPRequestHandler):
                 params = {'hit': result[1], 'sink': result[2]}
                 end_game = True
 
+        # Send the response
         self.send_response(response, urllib.parse.urlencode(params))
         self.send_header('Content-type', 'text/html')
         self.end_headers()
@@ -83,15 +88,16 @@ class BattleshipServer(BaseHTTPRequestHandler):
             print('end game')
             self.close_connection
 
-
+# Makes the server
 def make_connection(port, ip):
     server = HTTPServer((ip, port), BattleshipServer)
     server.serve_forever()
 
 
 if __name__ == '__main__':
+    # Port from user
     port = int(sys.argv[1])
+    # File name from user
     file_name = sys.argv[2]
-    #0 for Brodcast IP, 1 for local ip
-
+    # Creates the connection
     make_connection(port, '127.0.0.1')
